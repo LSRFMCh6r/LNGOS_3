@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LNGOS - Smartphone Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@500;700;800&family=Space+Grotesk:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Smooth transitions */
+        .transition-all-300 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .transition-all-500 { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .transition-transform-300 { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(30, 30, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-strong {
+            background: rgba(20, 20, 20, 0.88);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        /* App Icons with gradient backgrounds */
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .app-icon::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, transparent 55%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .app-icon:active {
+            transform: scale(0.88);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .app-icon-gradient-1 { background: linear-gradient(135deg, #FF6B6B, #EE5A6F); }
+        .app-icon-gradient-2 { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+        .app-icon-gradient-3 { background: linear-gradient(135deg, #45B7D1, #96C93D); }
+        .app-icon-gradient-4 { background: linear-gradient(135deg, #F093FB, #F5576C); }
+        .app-icon-gradient-5 { background: linear-gradient(135deg, #4FACFE, #00F2FE); }
+        .app-icon-gradient-6 { background: linear-gradient(135deg, #43E97B, #38F9D7); }
+        .app-icon-gradient-7 { background: linear-gradient(135deg, #FA709A, #FEE140); }
+        .app-icon-gradient-8 { background: linear-gradient(135deg, #30CFD0, #330867); }
+        .app-icon-gradient-9 { background: linear-gradient(135deg, #A8EDEA, #FED6E3); color: #1f2937; }
+        .app-icon-gradient-10 { background: linear-gradient(135deg, #FF9A9E, #FECFEF); color: #1f2937; }
+        .app-icon-gradient-11 { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .app-icon-gradient-12 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+
+        /* Dock */
+        .dock {
+            background: rgba(40, 40, 40, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 32px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Notification Badge */
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF3B30;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #0a0a0a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            z-index: 5;
+        }
+
+        /* Scrollbar hide */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Control Center Toggles */
+        .control-toggle {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: rgba(60, 60, 60, 0.8);
+            color: white;
+        }
+
+        .control-toggle.active {
+            background: #34C759;
+            color: white;
+        }
+
+        .control-toggle.active-blue {
+            background: #007AFF;
+            color: white;
+        }
+
+        .control-toggle.active-amber {
+            background: #FF9500;
+            color: white;
+        }
+
+        /* Music Progress */
+        .progress-bar {
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            transition: width 0.2s linear;
+        }
+
+        /* App Store Cards */
+        .app-card {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        /* Lock Screen Animations */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.65; }
+            50% { opacity: 1; }
+        }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+        .swipe-indicator { animation: bounce-up 1.5s ease-in-out infinite; }
+        @keyframes bounce-up {
+            0%, 100% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(-7px); opacity: 1; }
+        }
+
+        /* Page transitions */
+        .page-enter { animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0.4; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Wallpapers */
+        .wallpaper {
+            background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0a 55%, #000000 100%);
+            position: relative;
+        }
+        .wallpaper-aurora {
+            background: radial-gradient(circle at 20% 20%, #065f46 0%, #0f172a 55%, #020617 100%);
+        }
+        .wallpaper-crimson {
+            background: radial-gradient(circle at 80% 25%, #881337 0%, #1e1b4b 60%, #09090b 100%);
+        }
+        .wallpaper-ocean {
+            background: radial-gradient(circle at 50% 15%, #1d4ed8 0%, #0f172a 60%, #020617 100%);
+        }
+
+        .wallpaper::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(100,100,255,0.06) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification slide */
+        .notification-item {
+            transform: translateX(0);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .notification-item.swiped {
+            transform: translateX(-110%);
+            opacity: 0;
+        }
+
+        /* Volume/brightness slider */
+        .slider-track {
+            width: 100%;
+            height: 44px;
+            background: rgba(60, 60, 60, 0.65);
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .slider-fill {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        /* Smartphone Outer Bezel on Desktop */
+        @media (min-width: 640px) {
+            .phone-frame {
+                width: 400px;
+                height: 830px;
+                border-radius: 50px;
+                box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 0 11px #1c1c1f, 0 0 0 13px #3a3a40;
+            }
+        }
+
+        /* ===== LNGOS 3.0 ===== */
+        html{-webkit-font-smoothing:antialiased}
+        :root{--sys-font:'Inter',-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue","Apple Color Emoji","Noto Color Emoji","Segoe UI Emoji",sans-serif;--mono-font:'JetBrains Mono',"SF Mono",ui-monospace,SFMono-Regular,Menlo,monospace,"Apple Color Emoji","Noto Color Emoji"}
+        body,button,input,textarea,select{font-family:var(--sys-font);letter-spacing:-.011em}
+        .font-mono{font-family:var(--mono-font)}
+        #lock-time{font-weight:600;letter-spacing:-.04em}
+        :root{--accent:#0A84FF;--fg:#fff;--fg2:rgba(235,235,245,.62);--glass:rgba(30,30,30,.65);--glass2:rgba(20,20,20,.88);--glassb:rgba(255,255,255,.08);--app:rgba(10,10,10,.95)}
+        html.light :is(#app-window,#control-center,#toast-banner,#spotlight){--fg:#000;--fg2:rgba(60,60,67,.72);--glass:rgba(255,255,255,.72);--glass2:rgba(246,246,250,.95);--glassb:rgba(0,0,0,.08);--app:rgba(242,242,247,.98);color:var(--fg)}
+        html.amoled :is(#app-window,#control-center,#spotlight){--app:#000;--glass:rgba(28,28,30,.9);--glass2:#000}
+        .glass{background-color:var(--glass)}.glass-strong{background-color:var(--glass2)}
+        .glass,.glass-strong{border-color:var(--glassb)}
+        #app-window{background:var(--app)!important}
+        html.light :is(#app-window,#control-center,#toast-banner,#spotlight) :is(.text-white,.text-neutral-100,.text-neutral-200):not([class*="bg-"]){color:var(--fg)}
+        html.light :is(#app-window,#control-center,#toast-banner,#spotlight) :is(.text-neutral-300,.text-neutral-400,.text-neutral-500){color:var(--fg2)}
+        html.light :is(#app-window,#spotlight) :is(input:not(#term-input),textarea){color:var(--fg)}
+        html.light :is(#app-window,#spotlight) .bg-white\/5{background-color:rgba(0,0,0,.06)}
+        html.light #app-window .border-white\/10{border-color:rgba(0,0,0,.1)}
+        html.light #app-window .progress-bar,html.light .slider-track{background:rgba(0,0,0,.12)}
+        .slider-fill,.progress-fill{background:var(--fg)}
+        .text-sky-400,.text-sky-300{color:var(--accent)!important}
+        .bg-sky-500,.bg-sky-600{background-color:var(--accent)!important}
+        .border-sky-400{border-color:var(--accent)!important}
+        .control-toggle.active-blue{background:var(--accent)}
+        .wp-sunset{background:linear-gradient(160deg,#ff6a3d 0%,#c2255c 45%,#2b1055 100%)}
+        .wp-forest{background:radial-gradient(circle at 30% 20%,#2d6a4f,#081c15 70%)}
+        .wp-grape{background:linear-gradient(160deg,#7b2ff7,#2d1b69 60%,#0b0618)}
+        .wp-graphite{background:linear-gradient(160deg,#3a3a3c,#1c1c1e 60%,#000)}
+        .cal-day{aspect-ratio:1;border-radius:50%;font-size:13px;position:relative}
+    </style>
+</head>
+<body class="h-screen w-screen flex items-center justify-center bg-neutral-950 text-white">
+
+    <!-- MARCO PRINCIPAL DEL SMARTPHONE -->
+    <div id="phone-shell" class="phone-frame wallpaper relative w-full h-full overflow-hidden flex flex-col justify-between select-none">
+
+        <!-- CAPA DE BRILLO / ATENUACIÓN -->
+        <div id="brightness-overlay" class="absolute inset-0 bg-black pointer-events-none z-50 transition-opacity duration-150" style="opacity: 0;"></div>
+
+        <!-- EFECTO DE LINTERNA -->
+        <div id="flashlight-overlay" class="absolute inset-0 pointer-events-none z-40 transition-opacity duration-300 opacity-0" style="box-shadow: inset 0 0 90px 30px rgba(255, 250, 220, 0.95); background: radial-gradient(circle at center, rgba(255,255,255,0.25), rgba(255,250,210,0.45));"></div>
+
+        <!-- BANNER DE NOTIFICACIÓN FLOTANTE (TOAST) -->
+        <div id="toast-banner" class="absolute top-12 left-4 right-4 z-50 glass-strong p-3 rounded-2xl shadow-2xl transform -translate-y-28 opacity-0 transition-all duration-300 flex items-center space-x-3 pointer-events-none">
+            <div id="toast-icon" class="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center text-sm text-white shrink-0">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 id="toast-title" class="text-xs font-bold text-white truncate">LNGOS</h4>
+                <p id="toast-desc" class="text-[11px] text-neutral-300 truncate">Notificación del sistema</p>
+            </div>
+            <span class="text-[10px] text-neutral-400">Ahora</span>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 1. BARRA DE ESTADO SUPERIOR (SIEMPRE VISIBLE)             -->
+        <!-- ========================================================= -->
+        <header id="status-bar" class="relative z-40 h-11 px-6 pt-2 flex items-center justify-between text-xs font-semibold">
+            <span id="status-time" class="tracking-tight">9:41</span>
+
+            <!-- Dynamic Island -->
+            <div id="dynamic-island" onclick="pulseDynamicIsland()" class="h-7 w-28 bg-black rounded-full flex items-center justify-between px-3 cursor-pointer transition-all duration-300 hover:w-36 border border-white/10 shadow-md">
+                <span id="island-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="island-label" class="text-[10px] font-mono text-neutral-300 tracking-tighter">LNGOS v2.6</span>
+                <span class="w-2 h-2 rounded-full bg-neutral-800"></span>
+            </div>
+
+            <!-- Iconos de estado + Trigger Centro de Control -->
+            <div onclick="toggleControlCenter(true)" title="Abrir Centro de Control" class="flex items-center space-x-2 cursor-pointer py-1 px-1.5 rounded-lg hover:bg-white/10 transition">
+                <i id="status-airplane" class="fa-solid fa-plane text-[11px] text-amber-400 hidden"></i>
+                <i id="status-dnd" class="fa-solid fa-moon text-[11px] text-purple-400 hidden"></i>
+                <i id="status-signal" class="fa-solid fa-signal text-[11px]"></i>
+                <i id="status-wifi" class="fa-solid fa-wifi text-[11px]"></i>
+                <div class="flex items-center space-x-1">
+                    <span id="status-battery-text" class="text-[11px] font-mono">96%</span>
+                    <i class="fa-solid fa-battery-three-quarters text-emerald-400 text-xs"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========================================================= -->
+        <!-- 2. PANTALLA DE INICIO (HOME SCREEN)                       -->
+        <!-- ========================================================= -->
+        <main id="home-screen" class="relative z-10 flex-1 flex flex-col justify-between px-5 pt-3 pb-5 overflow-hidden">
+            
+            <!-- Widgets Interactivos Superiores -->
+            <section class="grid grid-cols-2 gap-3">
+                <!-- Widget Clima Tocuyito -->
+                <div onclick="openApp('weather')" class="glass p-3.5 rounded-3xl cursor-pointer hover:bg-white/10 active:scale-95 transition flex flex-col justify-between h-28">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold text-neutral-300 flex items-center gap-1">
+                            <i class="fa-solid fa-location-dot text-sky-400 text-[10px]"></i> Tocuyito
+                        </span>
+                        <i class="fa-solid fa-cloud-sun text-amber-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <div id="widget-temp" class="text-2xl font-extrabold tracking-tight">27°C</div>
+                        <div class="text-[11px] text-neutral-300">Parcialmente nublado</div>
+                    </div>
+                </div>
+
+                <!-- Widget Música Compacto -->
+                <div class="glass p-3.5 rounded-3xl flex flex-col justify-between h-28 relative overflow-hidden">
+                    <div onclick="openApp('music')" class="cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-pink-400">Música</span>
+                            <i id="widget-music-wave" class="fa-solid fa-wave-square text-pink-400 text-xs"></i>
+                        </div>
+                        <h4 id="widget-song-title" class="text-xs font-bold truncate mt-1">Midnight Synth</h4>
+                        <p id="widget-song-artist" class="text-[10px] text-neutral-400 truncate">LNGOS Lo-Fi Beats</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <button onclick="prevTrack()" class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-xs"><i class="fa-solid fa-backward-step"></i></button>
+                        <button onclick="toggleMusicPlay()" id="widget-play-btn" class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-xs shadow active:scale-90 transition">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <button onclick="nextTrack()" class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-xs"><i class="fa-solid fa-forward-step"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cuadrícula Dinámica de Aplicaciones -->
+            <section id="home-app-grid" class="grid grid-cols-4 gap-y-5 gap-x-3 my-auto py-2">
+                <!-- Se renderiza dinámicamente desde JS para soportar App Store -->
+            </section>
+
+            <!-- Barra de Búsqueda Rápida / Centro de Control Hint -->
+            <div class="flex justify-center gap-2"><div onclick="LX.spOpen()" class="glass px-4 py-1.5 rounded-full text-[11px] text-neutral-300 flex items-center space-x-2 cursor-pointer hover:bg-white/15 transition"><i class="fa-solid fa-magnifying-glass text-pink-400"></i><span>Buscar</span></div>
+            <div onclick="toggleControlCenter(true)" class="glass px-4 py-1.5 rounded-full text-[11px] text-neutral-300 flex items-center space-x-2 cursor-pointer hover:bg-white/15 transition">
+                <i class="fa-solid fa-sliders text-sky-400"></i>
+                <span>Centro de Control</span>
+            </div>
+
+            </div>
+            <!-- Dock Inferior Fijo -->
+            <footer class="dock p-3 flex items-center justify-around shadow-2xl mt-2">
+                
